@@ -1,0 +1,25 @@
+{
+    "message": "The request body has 5 error(s)",
+    "details": [
+        {
+            "message": "must be specified",
+            "property": "areas"
+        },
+        {
+            "message": "must be specified",
+            "property": "chatBarText"
+        },
+        {
+            "message": "must be specified",
+            "property": "name"
+        },
+        {
+            "message": "must be specified",
+            "property": "selected"
+        },
+        {
+            "message": "must be specified",
+            "property": "size"
+        }
+    ]
+}
