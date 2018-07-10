@@ -1,94 +1,97 @@
-<?php
+<?php 
 
-    require 'line_access.php';
-    require 'vendor/autoload.php';    
+    require_once 'line_access.php';
+    require_once 'vendor/autoload.php';
 
     $access_token = ACCESS_TOKEN;
     $channelSecret = CHANNEL_SECRET;
-    $pushID = USER_ID;
+    // $user_id = USER_ID;
 
     $httpClient = new \LINE\LINEBot\HTTPClient\CurlHTTPClient($access_token);
     $bot = new \LINE\LINEBot($httpClient, ['channelSecret' => $channelSecret]);
 
-    #  --------------------- Declare CLASS -------------------------------------
+    # ------------------------------------- USE LINECLASS ----------------------------------------
 
-    use \LINE\LINEBot\MessageBuilder\TextMessageBuilder;
+    use \LINE\LINEBot\RichMenuBuilder;
+    use \LINE\LINEBot\RichMenuBuilder\RichMenuSizeBuilder;
     use \LINE\LINEBot\RichMenuBuilder\RichMenuAreaBoundsBuilder;
     use \LINE\LINEBot\RichMenuBuilder\RichMenuAreaBuilder;
-    use \LINE\LINEBot\RichMenuBuilder\RichMenuSizeBuilder;
+
     use \LINE\LINEBot\TemplateActionBuilder;
     use \LINE\LINEBot\TemplateActionBuilder\UriTemplateActionBuilder;
-    use \LINE\LINEBot\Event\PostbackEvent;
-    use \LINE\LINEBot;
-    use \LINE\LINEBot\RichMenuBuilder;
-   
 
-    # ----------------------- Get Text from user ----------------------------------
+    use \LINE\LINEBot\MessageBuilder;
+    use \LINE\LINEBot\MessageBuilder\TextMessageBuilder;
+  
 
-    $content = file_get_contents('php://input');
-    $events = json_decode($content,true);
 
-    # ----------------- IF word = 'rich menu' it will show rich menu --------------
+    # ------------------- Get data From user ----------------------------------------------------
 
-    if(!is_null($events['events'])){
+    // Get POST body content
+    $content = file_get_contents('php://input');    
+    // Parse JSON
+    $events = json_decode($content, true);
 
-        # ------- Code to check the data input -------------------------
+    # -------------------------------- Decleare Richmenu Property --------------------------------
 
-        // $replyToken = $events['events'][0]['replyToken'];
+    if(!is_null($events['events'])){       
+        foreach ($events['events'] as $event) {
 
-        // $msg = new TextMessageBuilder(json_encode($events));
-
-        // $response = $bot->replyMessage($replyToken, $msg);
-
-        # -------------------------------------------------------------
-
-        foreach($events['events'] as $event){
             $replyToken = $event['replyToken'];
+            $user_id = $event['source']['userId'];
             $msgType = $event['message']['type'];
-            $userId = $event['source']['userId'];
 
             if($msgType == 'text'){
-                $msg = trim(strtolower($event['message']['text']));
-                if($msg == 'richmenu'){
-                    # ----------------------- DECLEAR Rich Menu Property --------------------------
-                    $sizeBuilder = new RichMenuSizeBuilder(1686,2500);
-                    $boundBuilder = new RichMenuAreaBoundsBuilder(0,0,2500,1686);
-                    $actionBuilder = new UriTemplateActionBuilder('Google','htttp://www.google.com');
-                    $areaBuilder = new RichMenuAreaBuilder($boundBuilder,$actionBuilder);
+                $textMsg = trim(strtolower($event['message']['text']));
+                if($textMsg == 'richmenu'){
+                    # -------------------------------- Decleare Richmenu Property --------------------------------
 
-                    # -------------------- Create Rich Menu ----------------------------------
+                    $sizeBuilder = RichMenuSizeBuilder::getFull();
+                    $boundBuilder = new RichMenuAreaBoundsBuilder(0,0,2500,1686);
+                    $actionBuilder =  new UriTemplateActionBuilder('Test','http://www.google.com');
+
+                    $areaBuilder = array(
+                        new RichMenuAreaBuilder($boundBuilder,$actionBuilder)
+                    );
 
                     $builder = new RichMenuBuilder($sizeBuilder,true,'Controller','Tab to open',$areaBuilder);
 
-                    $response = $bot->createRichmenu($builder);
+                    # -------------------- Create Rich Menu ---------------------------------
 
-                    #------------------------- Get rich menu id -----------------------------
+                    $response = $bot->createRichMenu($builder);
 
-                    $richMenuIdArray = $response->getJSONDecodedBody();
-                    $richMenuId = $richMenuIdArray['richMenuId'];
 
-                    # ----------------------- DELETE existing Rich menu ---------------------------
+                    // # ------------ Get Richmenu Id -----------------------
 
-                    // $bot->deleteRichMenu($richMenuId);
+                    $richMenuIdArr = $response->getJSONDecodedBody();
+                    $richMenuId = $richMenuIdArr['richMenuId'];
 
-                    # ----------------------- Link User id with Richmenu ID -----------------
+                    # ------------ Link user id with richmenu id --------
 
-                    $link = $bot->linkRichMenu($userId,$richMenuId);
-
-                    # ----------------------- Upload img to line Rich menu ------------------
-                    $uploadImg = $bot->uploadRichMenuImage($richMenuId,'E:\xampp\htdocs\line-rich\controller.jpg','image/jpg');
-
+                    $link = $bot->linkRichMenu($user_id,$richMenuId);
+        
+                    # -------------- Insert image to Richmenu -----------
+                    
+                    $upload = $bot->uploadRichMenuImage($richMenuId,'E:\xampp\htdocs\line-rich\controller.jpg','image/jpg');
+                    
                     if($response->isSucceeded()){
-                    $msg = new TextMessageBuilder('Rich menu create');
-                    $bot->pushMessage($userId,$msg);
+                        if($link && $upload){
+                            $msg = new TextMessageBuilder('Response, link and upload are success');
+                            $bot->replyMessage($replyToken,$msg);
+                        }
+                        else{
+                            $msg = new TextMessageBuilder('Response success but not link and upload');
+                            $bot->replyMessage($replyToken,$msg);
+                            return;
+                        }
                     }else{
-                    echo 'Error';
-                    echo $response->getHTTPStatus() . ' ';
-                    echo '<pre>';
-                    echo $response->getRawBody();
-                    echo '</pre>';
+                        $msg = new TextMessageBuilder('Response failed');
+                        $bot->replyMessage($replyToken,$msg);
+                        return;
                     }
-                    # ------------------------------------------------------------------------
+                }elseif($textMsg != 'richmenu'){
+                    $msg = new TextMessageBuilder('Type Richmenu to activate richmenu');
+                    $bot->replyMessage($replyToken,$msg);
                 }
             }
         }

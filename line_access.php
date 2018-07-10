@@ -1,9 +1,6 @@
 <?php
 
-	define('CHANEL_ID', '1592350754' , true);
-
-	define('ACCESS_TOKEN','g6yX4Y/U+N/gW/lMujIdnMPfH1rLC9D90AAL9XjWbbY0HgNVB8orzUv3OyIIlXxJmBuWXpCryiNY5zwts2OrwZhV3FLAj1dRCkyzOMTjvrZmjullWJ0ZMTIgPwJeIrYS0sC0BVQlbeRxPrYoppEzhgdB04t89/1O/w1cDnyilFU=', true);
-
-	define('CHANNEL_SECRET', '393b783703f892392f99157acecc0783' , true);
-
-	define('USER_ID','Ue8b4d0638b780f9dde18f5806ea391a8',true);
+    define('ACCESS_TOKEN','YV0y+csInngVdUHbVw1z5qGZHlAHy0rembKV70e4ipZiObL7ImyIHt3Vccwrp87xJj7knAD66kpoYeq48JGrmgjXfoERT6chP4JVQ+GeZsszkomVcHOi8vflP4jbJXut4OfUeENEwXbaPHcg3xCCzQdB04t89/1O/w1cDnyilFU=',true);
+    define('CHANNEL_SECRET','96cb07c8165f3c7fbd3575c94c654805',true);
+    define('USER_ID','Ue8b4d0638b780f9dde18f5806ea391a8',true);
+    define('CHANNEL_ID','1593064213',true);
