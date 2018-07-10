@@ -32,6 +32,8 @@
     // Parse JSON
     $events = json_decode($content, true);
 
+    echo 'Webhook Activated';
+
     # -------------------------------- Decleare Richmenu Property --------------------------------
 
     if(!is_null($events['events'])){       
@@ -96,4 +98,4 @@
             }
         }
     }
-    echo 'Webhook Activated';
+    
