@@ -96,3 +96,4 @@
             }
         }
     }
+    echo 'Webhook Activated';
